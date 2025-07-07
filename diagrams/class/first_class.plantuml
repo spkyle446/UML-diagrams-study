@@ -1,0 +1,30 @@
+@startuml
+
+class EmailService {
+  +sendEmail(to: String, subject: String, body: String): boolean
+  +addToQueue(email: Email): void
+}
+
+class Email {
+  -to: String
+  -subject: String
+  -body: String
+  -status: String
+  +getTo(): String
+  +getSubject(): String
+  +getBody(): String
+  +setStatus(status: String): void
+}
+
+class EmailQueue {
+  -emails: List<Email>
+  +addEmail(email: Email): void
+  +getNextEmail(): Email
+  +hasMore(): boolean
+}
+
+EmailService "1" --> "0..*" Email : отправляет
+EmailService --> EmailQueue : использует
+EmailQueue "1" --> "*" Email : содержит
+
+@enduml

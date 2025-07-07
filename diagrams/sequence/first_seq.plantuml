@@ -1,0 +1,34 @@
+@startuml
+
+actor User as "Пользователь"
+participant "EmailService" as ES
+participant "EmailQueue" as EQ
+participant "SMTP Server" as SMTP
+
+User -> ES: sendEmail(to, subject, body)
+activate ES
+
+ES -> ES: create Email object
+ES -> EQ: addEmail(email)
+activate EQ
+EQ --> ES: email added
+deactivate EQ
+
+ES -> ES: processQueue()
+loop while emails in queue
+    ES -> EQ: getNextEmail()
+    activate EQ
+    EQ --> ES: email
+    deactivate EQ
+
+    ES -> SMTP: send(email)
+    activate SMTP
+    SMTP --> ES: success/failure
+    deactivate SMTP
+
+    ES -> ES: updateStatus(email)
+end
+ES --> User: confirmation
+deactivate ES
+
+@enduml
