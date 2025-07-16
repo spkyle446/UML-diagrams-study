@@ -1,0 +1,64 @@
+@startuml
+
+actor "Manager" as manager #blue
+
+box "Information System"
+participant "Web UI " as web 
+participant ArtemisService
+end box
+
+queue "Artemis" as artemis #gold
+participant "WithdrawalService" as ws
+
+autonumber
+
+web++
+manager -> web: Вывести \nденежные \nсредства
+note right manager: (далее, ДС)
+
+group Передача поручения в систему вывода    
+    web -> web: Блокировка ДС
+    note right web: Блокируем ДС чтобы \nизбежать двойных \nопераций
+    web -> ArtemisService++: Передача распоряжения \nна вывод ДС
+    ArtemisService -> artemis++: Отправка распоряжение \nна вывод ДС в очередь
+    ArtemisService--
+end
+
+ws++
+group Обработка поручений на вывод ДС
+    ws -> artemis: Чтение распоряжения на \nвывод ДС из очереди
+    artemis -[#green]-> ws: Распоряжения на \nвывод ДС
+    artemis--
+
+    ws -> ws: Валидация входящих \nпараметров
+    alt Ошибка валидации
+        ws -[#red]> artemis++: Отправка ответа с ошибкой
+    else Валидация проведена
+        ws -> ws: Обработка распоряжения \nна вывод ДС
+        alt Ошибка обработки распоряжения
+            ws -[#red]> artemis: Отправка ответа с ошибкой
+        else Распоряжение проведено
+            ws -[#green]> artemis: Отправка статуса по \nисполненному распоряжению
+        end
+    end
+end
+ws--
+
+group Получение рузультата обработки поручения системой вывода
+    web -> ArtemisService++: Запрос статуса \nпроведения распоряжения \nна вывод ДС
+    ArtemisService -> artemis: Чтение статуса \nпроведения распоряжения \nна вывод ДС из очереди
+    artemis -[#green]-> ArtemisService: Cтатус проведения \nпоручений на вывод ДС
+    artemis--
+
+    alt Поручение доставлено
+        ArtemisService --> web: Cтатус проведения \nпоручений на вывод ДС
+        ArtemisService--
+    else Поручение «сгорело»
+        note left ArtemisService: В случае «сгорания» недоставленных \nсообщений — повторная отправка \nосуществляется только через функционал \n«ручной» переотправки поручений
+    end
+end
+
+web --> manager: Статус по \nвыводу ДС
+web--
+
+@enduml
