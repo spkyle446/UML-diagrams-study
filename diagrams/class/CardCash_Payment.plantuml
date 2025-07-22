@@ -1,0 +1,42 @@
+@startuml PaymentSystem
+
+abstract class Payment {
+  -amount: float
+  -paymentDate: Date
+  -transactionId: String
+  +{abstract} processPayment()
+  +getAmount(): float
+  +getPaymentDate(): Date
+  +getTransactionId(): String
+}
+
+class CashPayment {
+  -cashProvided: float
+  +processPayment()
+  +calculateChange(): float
+  +getCashProvided(): float
+}
+
+class CardPayment {
+  -cardNumber: String
+  -cardHolder: String
+  -expiryDate: String
+  +processPayment()
+  -validateCard(): boolean
+  +getCardNumber(): String
+  +getCardHolder(): String
+  +getExpiryDate(): String
+}
+
+class PaymentManager {
+  -payments: List<Payment>
+  +registerPayment(payment: Payment)
+  +processAllPayments()
+  +getPayments(): List<Payment>
+}
+
+Payment <|-- CashPayment
+Payment <|-- CardPayment
+PaymentManager o-- Payment
+
+@enduml
