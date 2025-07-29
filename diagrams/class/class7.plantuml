@@ -1,0 +1,105 @@
+@startuml
+
+' Пользователь
+class User {
+    -userId: Integer
+    -userName: String
+    -profile: <reference> Profile
+    +login(): Boolean
+    +logout(): Boolean
+}
+
+' Профиль
+class Profile {
+    -profileId: Integer
+    -bio: String
+    -avatarUrl: String
+    +getProfile(): String
+}
+
+' Студент
+class Student {
+    -studentId: String
+    -level: String
+    +subscribeCourse(): Boolean
+}
+
+' Инструктор
+class Instructor {
+    -instructorId: String
+    -department: String
+    +createCourse(): Boolean
+}
+
+' Курс
+class Course {
+    -courseId: String
+    -title: String
+    -description: String
+    -startDate: Date
+    -endDate: Date
+    +publish(): Boolean
+    +archive(): Boolean
+}
+
+' Зачисление
+class Enrollment {
+    -enrollmentDate: Date
+    -grade: String
+    -EnrollmentStatus: String
+    +calculateProgress(): void
+}
+
+' Материал
+class Material {
+    -materialId: String
+    -title: String
+    -type: String
+    -content: String
+    +upload(): Boolean
+    +download(): File
+}
+
+' Модуль
+class Module {
+  - moduleId: String
+  - title: String
+  - order: int
+}
+
+' Секция
+class Section {
+  - sectionId: String
+  - title: String
+  - content: String
+}
+
+' Платеж
+class PaymentProcessor {
+    processPayment(): Boolean
+}
+
+User "1"--> "0..1" Profile: Содержит профиль (ассоциация, 0..1)
+
+User <|-- Student : "наследование (студент — подтип пользователя)"
+User <|-- Instructor : "наследование (преподаватель — подтип пользователя)"
+
+Student "1" -- "0..*" Course : "записывается на курс (ассоциация, 0..*)"
+Student "1" -- "0..1" Material : "использует материалы (ассоциация, 0..*)"
+Student "1" -- "1" Enrollment: "зачисляется на обучение (ассоциация, 1)"
+Student "1" -- "0..*" Instructor: "взаимодействует с инструкторами (ассоциация, 0..*)"
+
+Instructor "1" -- "1..*" Course : "ведёт курс (ассоциация, 1..*)"
+
+Enrollment "1" -- "1" Course : "ассоциативный класс (зачисление)"
+Material "1..*" -- "1" Course : "включён в курс (ассоциация, 1..*)"
+Course ..> PaymentProcessor : "использует процессор для оплаты(зависимость)"
+
+Course "1" *-- "1..*" Module : "композиция (при удалении курса удаляются модули)"
+Module "1" *-- "1..*" Section : "композиция (при удалении модуля удаляются разделы)"
+
+
+
+
+
+@enduml
