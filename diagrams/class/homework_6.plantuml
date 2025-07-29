@@ -27,8 +27,15 @@ class Student {
 ' Инструктор
 class Instructor {
     -instructorId: String
-    -department: String
+    -department: <reference> Departament
     +createCourse(): Boolean
+}
+
+' Департамент
+class Departament {
+    -depId: Integer
+    -depName: String
+    +getDepartamentInfo(): String
 }
 
 ' Курс
@@ -79,7 +86,8 @@ class PaymentProcessor {
     processPayment(): Boolean
 }
 
-User "1"--> "0..1" Profile: Содержит профиль (ассоциация, 0..1)
+User "1"--> "0..1" Profile: "cодержит профиль (ассоциация, 0..1)"
+Instructor "1"--> "1" Departament: "инструктор работает в отделе(ассоциация, 1)"
 
 User <|-- Student : "наследование (студент — подтип пользователя)"
 User <|-- Instructor : "наследование (преподаватель — подтип пользователя)"
@@ -88,7 +96,7 @@ Student "1" -- "0..*" Course : "записывается на курс (ассо
 Student "1" -- "0..1" Material : "использует материалы (ассоциация, 0..*)"
 Student "1" -- "1" Enrollment: "зачисляется на обучение (ассоциация, 1)"
 Student "1" -- "0..*" Instructor: "взаимодействует с инструкторами (ассоциация, 0..*)"
-
+Course "1" -- "1" Departament: "курс предложен департаментов (ассоциация, 1)"
 Instructor "1" -- "1..*" Course : "ведёт курс (ассоциация, 1..*)"
 
 Enrollment "1" -- "1" Course : "ассоциативный класс (зачисление)"
