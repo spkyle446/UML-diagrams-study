@@ -1,0 +1,41 @@
+@startuml
+left to right direction
+
+actor "Кредитный менеджер" as manager
+actor "Клиент" as client
+actor "Служба безопасности" as security
+actor "Бюро кредитных историй" as BKI
+
+rectangle "Рассмотрение кредитной заявки" {
+  usecase "UC1.Подать заявку на кредит" as UC1
+  usecase "UC2.Проверить данные клиента" as UC2
+  usecase "UC3.Проверить кредитную историю" as UC3
+  usecase "UC9.Провести проверку" as UC9
+  usecase "UC4.Принять решение по заявке" as UC4
+  usecase "UC5.Уведомить клиента" as UC5
+  usecase "UC6.Запросить дополнительные документы" as UC6
+  usecase "UC7.Отклонить заявку" as UC7 #ffb3c2
+  usecase "UC8.Одобрить заявку" as UC8 #98ff98
+  
+}
+
+client --> UC1
+manager --> UC4
+manager --> UC5
+security --> UC2
+BKI -> UC3
+
+UC1 ..> UC2 : include
+UC2 ..> UC3 : include
+UC4 ..> UC5 : include
+
+UC4 <.. UC7 : extend
+UC4 <.. UC8 : extend  
+UC2 <.. UC6 : extend  
+UC4 <.. UC2 : extend 
+
+UC2 --|> UC9
+UC3 --|> UC9
+
+
+@enduml
